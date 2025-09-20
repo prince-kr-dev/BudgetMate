@@ -75,12 +75,12 @@ authRouter.post("/login", async (req, res) => {
     );
 
     // ✅ Store token in cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS only
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // cross-site in prod
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production", // HTTPS only
+    //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // cross-site in prod
+    //   maxAge: 24 * 60 * 60 * 1000, // 1 day
+    // });
 
 
     // Also return user data
