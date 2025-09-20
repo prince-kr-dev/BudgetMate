@@ -13,7 +13,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",       // local frontend (dev)
-      "https://budget-mate-seven.vercel.app" // deployed frontend
+      "https://budget-mate-seven.vercel.app",
+      "https://budgetmate-5ity.onrender.com" // deployed frontend
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
