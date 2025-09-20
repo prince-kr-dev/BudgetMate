@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 
@@ -7,40 +7,42 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  // ✅ Initialize token and user directly from localStorage
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+
+  // ✅ Rehydrate token & user from localStorage on page load
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-    if (storedUser && storedUser !== "undefined") {
+
+    if (storedToken && storedUser && storedUser !== "undefined") {
       try {
-        return JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
       } catch (err) {
         console.error("Failed to parse stored user:", err);
+        localStorage.removeItem("token");
         localStorage.removeItem("user");
-        return null;
       }
     }
-    return null;
-  });
+    setIsAuthLoaded(true);
+  }, []);
 
   // ✅ Login
   const login = async ({ email, password }) => {
     try {
       const res = await api.post("/auth/login", { email, password });
+      const userData = res.data.data;
+      const token = res.data.token;
 
-      if (res.data.token && res.data.data) {
-        const userData = res.data.data;
+      setUser(userData);
+      setToken(token);
 
-        setUser(userData);
-        setToken(res.data.token);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
 
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(userData));
-
-        navigate("/dashboard");
-      } else {
-        throw new Error("Invalid response from server");
-      }
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Login failed");
@@ -58,8 +60,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      // navigate("/login");
-      window.location.href = "/";
+      window.location.href = "/login";
     }
   };
 
@@ -67,69 +68,21 @@ export const AuthProvider = ({ children }) => {
   const signup = async ({ email, userName, password }) => {
     try {
       const res = await api.post("/auth/signup", { email, userName, password });
+      const userData = res.data.data;
+      const token = res.data.token;
 
-      if (res.data.token && res.data.data) {
-        const userData = res.data.data;
+      setUser(userData);
+      setToken(token);
 
-        setUser(userData);
-        setToken(res.data.token);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
 
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(userData));
-
-        navigate("/dashboard");
-      } else {
-        throw new Error("Invalid response from server");
-      }
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Signup failed");
     }
   };
-
-  const dashboardData = async () => {
-    try {
-      const res = await api.get("/transactions/dashboard");
-      return res.data;
-    } catch (error) {
-      console.error("Failed to load:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to load:");
-    }
-  };
-
-  // ✅ FIXED Edit profile
-  const editUserProfile = async (profile) => {
-    try {
-      const res = await api.put("/profile/edit", profile);
-
-      // backend should return updated user object
-      const updatedUser = res.data.updatedUser || res.data.user || res.data;
-
-      // update context + localStorage
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      return updatedUser;
-    } catch (error) {
-      console.error("Failed to update:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to update:");
-      throw error;
-    }
-  };
-
-  const addTransaction = async (allData) => {
-    try {
-      await api.post("/transactions", allData);
-  
-      // ✅ Refetch and return updated dashboard data
-      const updated = await dashboardData();
-      return updated;
-    } catch (error) {
-      console.error("Failed to add transaction:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to add transaction");
-    }
-  };
-  
 
   return (
     <AuthContext.Provider
@@ -139,9 +92,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         signup,
-        dashboardData,
-        editUserProfile,
-        addTransaction
+        isAuthLoaded,
       }}
     >
       {children}

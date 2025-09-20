@@ -1,23 +1,25 @@
-import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import Overview from "../components/Overview";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, isAuthLoaded } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) navigate("/login"); // redirect if not logged in
-  }, [user, navigate]);
+    if (isAuthLoaded && !user) {
+      navigate("/login"); // redirect only after auth is loaded
+    }
+  }, [user, isAuthLoaded, navigate]);
 
-  if (!user) return null;
+  if (!isAuthLoaded || !user) return null; // wait until auth state is loaded
 
   return (
     <div className="pt-0 bg-slate-200">
-      <Navbar/>
-      <Overview/>
+      <Navbar />
+      <Overview />
     </div>
   );
 }
