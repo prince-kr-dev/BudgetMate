@@ -12,9 +12,9 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",       // local frontend (dev)
-      "https://budget-mate-seven.vercel.app",
-      "https://budgetmate-5ity.onrender.com" // deployed frontend
+      "http://localhost:5173", // For local development
+      "https://budgetmate-5ity.onrender.com", // Your deployed frontend on Render
+      "https://budgetmate-seven.vercel.app" // Your deployed frontend on Vercel
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
