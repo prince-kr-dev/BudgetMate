@@ -10,12 +10,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthLoaded && !user) {
-      navigate("/login"); // redirect only after auth loaded
-    }
+    if (isAuthLoaded && !user) navigate("/login");
   }, [user, isAuthLoaded, navigate]);
 
-  if (!isAuthLoaded || !user) return null; // wait until auth is loaded
+  if (!isAuthLoaded || !user) return null;
 
   return (
     <div className="pt-0 bg-slate-200">

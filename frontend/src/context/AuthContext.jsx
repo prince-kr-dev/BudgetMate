@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
-  // ✅ Rehydrate user & token from localStorage
+  // Load token/user from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -21,79 +21,54 @@ export const AuthProvider = ({ children }) => {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch (err) {
-        console.error("Failed to parse stored user:", err);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
     }
-    setIsAuthLoaded(true); // mark auth as loaded
+    setIsAuthLoaded(true);
   }, []);
 
-  // ✅ Login
   const login = async ({ email, password }) => {
     try {
       const res = await api.post("/auth/login", { email, password });
-      const userData = res.data.data;
-      const token = res.data.token;
+      setUser(res.data.data);
+      setToken(res.data.token);
 
-      setUser(userData);
-      setToken(token);
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.data));
 
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
-  // ✅ Logout
-  const logout = async () => {
+  const signup = async ({ userName, email, password }) => {
     try {
-      await api.post("/auth/logout");
-    } catch (error) {
-      console.error("Logout failed:", error.response?.data || error.message);
-    } finally {
-      setUser(null);
-      setToken(null);
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+      const res = await api.post("/auth/signup", { userName, email, password });
+      setUser(res.data.data);
+      setToken(res.data.token);
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.data));
+
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Signup failed");
     }
   };
 
-  // ✅ Signup
-  const signup = async ({ email, userName, password }) => {
-    try {
-      const res = await api.post("/auth/signup", { email, userName, password });
-      const userData = res.data.data;
-      const token = res.data.token;
-
-      setUser(userData);
-      setToken(token);
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Signup failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Signup failed");
-    }
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        token,
-        login,
-        logout,
-        signup,
-        isAuthLoaded,
-      }}
+      value={{ user, token, login, signup, logout, isAuthLoaded }}
     >
       {children}
     </AuthContext.Provider>
