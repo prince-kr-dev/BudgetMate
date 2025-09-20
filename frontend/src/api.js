@@ -3,6 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://budgetmate-backend-ecwd.onrender.com", // make sure your backend uses /api
+  withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
 
