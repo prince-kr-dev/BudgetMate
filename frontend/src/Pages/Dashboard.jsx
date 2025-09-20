@@ -1,3 +1,4 @@
+// src/pages/Dashboard.js
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -10,11 +11,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (isAuthLoaded && !user) {
-      navigate("/login"); // redirect only after auth is loaded
+      navigate("/login"); // redirect only after auth loaded
     }
   }, [user, isAuthLoaded, navigate]);
 
-  if (!isAuthLoaded || !user) return null; // wait until auth state is loaded
+  if (!isAuthLoaded || !user) return null; // wait until auth is loaded
 
   return (
     <div className="pt-0 bg-slate-200">

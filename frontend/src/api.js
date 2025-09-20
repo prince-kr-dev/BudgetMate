@@ -1,14 +1,12 @@
+// src/api.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://budgetmate-backend-ecwd.onrender.com",
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "https://budgetmate-backend-ecwd.onrender.com", // make sure your backend uses /api
+  headers: { "Content-Type": "application/json" },
 });
 
-// ✅ Interceptor: attach token to every request automatically
+// ✅ Automatically attach token from localStorage to all requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

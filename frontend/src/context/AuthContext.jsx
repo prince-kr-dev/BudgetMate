@@ -1,3 +1,4 @@
+// src/context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
@@ -6,12 +7,11 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
-  // ✅ Rehydrate token & user from localStorage on page load
+  // ✅ Rehydrate user & token from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("user");
       }
     }
-    setIsAuthLoaded(true);
+    setIsAuthLoaded(true); // mark auth as loaded
   }, []);
 
   // ✅ Login
