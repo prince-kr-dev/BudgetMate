@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authContext";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
 function Transactions() {

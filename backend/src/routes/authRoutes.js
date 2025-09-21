@@ -1,31 +1,38 @@
-// routes/authRoutes.js
 const express = require("express");
 const User = require("../models/user");
+
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 const authRouter = express.Router();
 
-// Signup
 authRouter.post("/signup", async (req, res) => {
   try {
     const { userName, email, password } = req.body;
 
-    // Check username/email
-    if (await User.findOne({ userName })) {
+    //check if userName already present
+    const existingUserName = await User.findOne({ userName });
+    if (existingUserName) {
       return res.status(400).json({ message: "Username already exists" });
     }
-    if (await User.findOne({ email })) {
+
+    //check if email already present
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Validate password
+    //validate password is strong or not
     if (!validator.isStrongPassword(password)) {
-      return res.status(400).json({ message: "Enter strong password" });
+      return res.status(400).json({
+        message: "Enter strong password",
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const user = new User({ userName, email, password: hashedPassword });
     await user.save();
 
@@ -33,44 +40,74 @@ authRouter.post("/signup", async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.status(201).json({ message: "Signup successful", token, data: user });
+    res.status(201).json({
+      message: "User added successfully",
+      data: user,
+      token
+    });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(400).send("ERROR: " + err);
   }
 });
 
-// Login
 authRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ message: "Email and password required" });
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(401).json({ message: "Invalid email or password" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(401).json({ message: "Invalid email or password" });
+    const isMatchPassword = await bcrypt.compare(password, user.password);
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+    if (!isMatchPassword) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || "fallbackSecretKey",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
+    );
+
+    // ✅ Store token in cookie
+    res.cookie("token", token, {
+      httpOnly: true, // prevents JS access (XSS protection)
+      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+      sameSite: "strict", // CSRF protection
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
+    // Also return user data
     res.status(200).json({
       message: "Login successful",
-      token,
+      // token,
       data: {
         _id: user._id,
+        fullName:user.fullName,
         userName: user.userName,
-        fullName: user.fullName,
         email: user.email,
-        photoURL: user.photoURL,
+        photoURL:user.photoURL
       },
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(400).send("ERROR: " + err);
+  }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  try {
+    res
+      .cookie("token", null, {
+        expires: new Date(Date.now()),
+      })
+      .send("User Logged out successfully");
+  } catch (err) {
+    res.status(400).send("ERROR: " + err);
   }
 });
 

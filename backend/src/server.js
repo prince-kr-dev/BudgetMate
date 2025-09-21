@@ -9,17 +9,11 @@ const cookieParser = require("cookie-parser");
 dotenv.config();
 const app = express();
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173", // For local development
-      "https://budgetmate-5ity.onrender.com", // Your deployed frontend on Render
-      "https://budgetmate-seven.vercel.app" // Your deployed frontend on Vercel
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: "http://localhost:5173", // your frontend
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json());

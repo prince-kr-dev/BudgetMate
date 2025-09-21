@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authContext";
 import { Link, NavLink } from "react-router-dom";
 
 export default function Navbar() {
