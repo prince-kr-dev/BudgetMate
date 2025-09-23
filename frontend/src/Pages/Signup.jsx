@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const [form, setForm] = useState({

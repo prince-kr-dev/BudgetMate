@@ -7,7 +7,7 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
 } from "lucide-react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import TransactionAnalytics from "./TransactionAnalytics";
 
 const Overview = () => {

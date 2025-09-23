@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Edit3, Mail, AtSign, User, X } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 export default function Profile() {
