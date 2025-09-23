@@ -18,7 +18,7 @@ const Footer = () => {
 
         {/* GitHub Link */}
         <a
-          href="https://github.com/yourusername"
+          href="https://github.com/prince-kr-dev/BudgetMate/tree/main"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center text-gray-700 hover:text-green-500 transition"
