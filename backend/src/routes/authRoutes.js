@@ -76,10 +76,10 @@ authRouter.post("/login", async (req, res) => {
 
     // ✅ Store token in cookie
     res.cookie("token", token, {
-      httpOnly: true, // prevents JS access (XSS protection)
-      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-      sameSite: "strict", // CSRF protection
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      httpOnly: true,
+      secure: true,        // Vercel is HTTPS, so this is required
+      sameSite: "none",    // allow cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000 // (optional) 1 day expiration
     });
 
     // Also return user data
