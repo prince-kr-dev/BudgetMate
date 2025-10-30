@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // 🟢 New state for loading
+  const [loading, setLoading] = useState(false); 
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -17,12 +17,12 @@ export default function Login() {
     }
 
     try {
-      setLoading(true); // start loading
-      await login({ email, password }); // wait for backend response
+      setLoading(true); 
+      await login({ email, password });
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
-      setLoading(false); // stop loading after response
+      setLoading(false);
     }
   };
 
