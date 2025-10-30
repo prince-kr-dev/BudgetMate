@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://budget-mate-three.vercel.app", // replace with your backend URL
+  baseURL: "https://budgetmate-aowo.onrender.com", // replace with your backend URL
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

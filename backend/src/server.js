@@ -19,6 +19,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.send("BudgetMate Backend Server is Running Successfully!");
+});
+
 const authRoutes = require("./routes/authRoutes");
 const transactionRoutes = require("./routes/transactionRoutes")
 const profileRoutes = require("./routes/profileRoutes");
