@@ -6,15 +6,24 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // 🟢 New state for loading
   const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       alert("Please enter email and password");
       return;
     }
-    login({ email, password });
+
+    try {
+      setLoading(true); // start loading
+      await login({ email, password }); // wait for backend response
+    } catch (error) {
+      console.error("Login failed:", error);
+    } finally {
+      setLoading(false); // stop loading after response
+    }
   };
 
   return (
@@ -49,9 +58,14 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+            disabled={loading} // disable while loading
+            className={`w-full text-white py-2 rounded-lg transition ${
+              loading
+                ? "bg-green-400 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
